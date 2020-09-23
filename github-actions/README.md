@@ -6,7 +6,7 @@ Generates Markdown docs for GitHub Actions.
 
 | Name | Description | Required | Default |
 | --- | --- | --- | --- |
-| exclude | A list of paths (one per line) to exclude from the generation. | false | third-party/ |
+| exclude | A list of paths (one per line) to exclude from the generation. Glob patterns are accepted. For reference, Ruby's Dir.glob is used: https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob | false | `third-party/**/*` |
 
 ## Outputs
 
