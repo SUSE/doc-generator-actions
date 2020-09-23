@@ -18,9 +18,8 @@ inputs:
   exclude:
     description: |-
       A list of paths (one per line) to exclude from the generation. Glob
-      patterns are accepted.
-      For reference, Ruby's Dir.glob is used:
-        https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob
+      patterns are accepted. For reference, Ruby's Dir.glob is used:
+      https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob.
     required: false
     default: |-
       third-party/**/*
@@ -28,26 +27,26 @@ outputs: {}
 runs:
   using: composite
   steps:
-  - run: |-
-      if [ -z '${{ github.head_ref }}' ]; then
-        >&2 echo "Not a pull request..."
-        exit 1
-      fi
-    shell: bash
   - run: ${{ github.action_path }}/generate.rb
     shell: bash
     env:
       EXCLUDE: ${{ inputs.exclude }}
   - run: |-
       set -o errexit -o nounset -o pipefail
-
       mapfile -d '' -t < <(git ls-files -z --deleted --modified --others **/*README.md)
-      if [ "${#MAPFILE[@]}" -gt 0 ]; then
+      echo "::set-output name=files::${MAPFILE[@]}"
+      echo "::set-output name=count::${#MAPFILE[@]}"
+    id: modified_files
+    shell: bash
+  - run: |-
+      set -o errexit -o nounset -o pipefail
+
+      if [ "${{ steps.modified_files.outputs.count }}" -gt 0 ]; then
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git checkout 'origin/${{ github.event.pull_request.head.ref }}'
-        git add "${MAPFILE[@]}"
+
+        git add ${{ steps.modified_files.outputs.files }}
         git commit --message 'doc: auto-generated GH Actions README.md'
-        git push origin 'HEAD:${{ github.event.pull_request.head.ref }}'
+        git push
       fi
     shell: bash
