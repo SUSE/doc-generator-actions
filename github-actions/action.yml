@@ -34,8 +34,8 @@ runs:
   - run: |-
       set -o errexit -o nounset -o pipefail
       mapfile -d '' -t < <(git ls-files -z --deleted --modified --others **/*README.md)
-      echo "::set-output name=files::${MAPFILE[@]}"
-      echo "::set-output name=count::${#MAPFILE[@]}"
+      echo "::set-output name=files::${MAPFILE[*]}"
+      echo "::set-output name=count::${#MAPFILE[*]}"
     id: modified_files
     shell: bash
   - run: |-
