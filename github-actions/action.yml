@@ -16,10 +16,14 @@ name: GitHub Actions Doc Generator
 description: Generates Markdown docs for GitHub Actions.
 inputs:
   exclude:
-    description: A list of paths (one per line) to exclude from the generation.
+    description: |-
+      A list of paths (one per line) to exclude from the generation. Glob
+      patterns are accepted.
+      For reference, Ruby's Dir.glob is used:
+        https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob
     required: false
     default: |-
-      third-party/
+      third-party/**/*
 outputs: {}
 runs:
   using: composite
@@ -37,12 +41,12 @@ runs:
   - run: |-
       set -o errexit -o nounset -o pipefail
 
-      files=($(git ls-files --deleted --modified --others **/*README.md))
-      if [ "${#files[@]}" -gt 0 ]; then
+      mapfile -d '' -t < <(git ls-files -z --deleted --modified --others **/*README.md)
+      if [ "${#MAPFILE[@]}" -gt 0 ]; then
         git config user.name github-actions
         git config user.email github-actions@github.com
         git checkout 'origin/${{ github.event.pull_request.head.ref }}'
-        git add "${files[@]}"
+        git add "${MAPFILE[@]}"
         git commit --message 'doc: auto-generated GH Actions README.md'
         git push origin 'HEAD:${{ github.event.pull_request.head.ref }}'
       fi

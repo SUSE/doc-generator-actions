@@ -14,26 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'open3'
 require 'yaml'
 
 EXCLUDE = ENV.fetch('EXCLUDE', '').
-            split("\n").
+            lines.
             map(&:strip).
-            map(&:chomp).
             reject(&:empty?)
 
-git_root = `git rev-parse --show-toplevel`.chomp
-Dir.chdir git_root do
+git_root, status = Open3.capture2('git', 'rev-parse', '--show-toplevel')
+raise 'Could not get git root path' unless status.success?
+
+Dir.chdir git_root.chomp do
   action_files = Dir.glob(File.join('**', 'action.{yml,yaml}'))
   EXCLUDE.each do |exclude|
-    action_files -= Dir.glob(File.join(exclude, '**', '*'))
+    action_files -= Dir.glob(exclude)
   end
   action_files.each do |action_file|
     STDERR.puts "Processing //#{action_file}..."
 
-    yaml = File.open(action_file, "r") do |f|
-      YAML.load(f.read)
-    end
+    yaml = YAML.load_file(action_file)
 
     readme_file = File.join(File.dirname(action_file), 'README.md')
     File.open(readme_file, "w") do |f|
@@ -52,7 +52,7 @@ Dir.chdir git_root do
           description = input["description"].gsub(/\s+/, ' ')
           required = input["required"]
           default = input["default"]
-          f << "| #{name} | #{description} | #{required} | #{default} |\n"
+          f << "| #{name} | #{description} | #{required} | `#{default}` |\n"
         end
       else
         f << "This action has no inputs.\n"
