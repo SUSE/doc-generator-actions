@@ -20,7 +20,7 @@ inputs:
       A list of paths (one per line) to exclude from the generation. Glob
       patterns are accepted.
       For reference, Ruby's Dir.glob is used:
-        https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob
+      https://ruby-doc.org/core-2.6.3/Dir.html#method-c-glob.
     required: false
     default: |-
       third-party/**/*
