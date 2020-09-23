@@ -1,6 +1,9 @@
-name: Pull request
+name: Documentation Generation
 
-on: pull_request
+on:
+  push:
+    branches:
+    - master
 
 jobs:
   generate_doc:
