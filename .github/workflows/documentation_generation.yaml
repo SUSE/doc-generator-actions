@@ -15,3 +15,5 @@ jobs:
         fetch-depth: 0
     - name: Generate Actions Documentation
       uses: ./github-actions
+      with:
+        github_token: '${{ github.token }}'
