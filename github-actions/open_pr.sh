@@ -16,6 +16,11 @@
 
 set -o errexit -o nounset -o pipefail
 
+# This script opens a PR if the provided branch is not currently being used as
+# the head of any other PR. If the branch is already the head, the general logic
+# is that the bot already opened a PR with this branch and the only necessary
+# step is to update the branch and push. If there are no PRs, the bot opens one.
+
 prs=$(
   curl \
     --fail \
