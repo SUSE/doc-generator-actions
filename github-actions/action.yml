@@ -31,7 +31,7 @@ inputs:
     description: |-
       The title of the commit with the generated doc. The PR will also use this
       title.
-    default: 'doc: auto-generated GH Actions README.md'
+    default: 'doc: auto-generated GitHub Actions README.md'
   github_token:
     description: The GitHub repository token.
     required: true
