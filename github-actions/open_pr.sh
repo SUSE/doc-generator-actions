@@ -25,6 +25,7 @@ prs=$(
   curl \
     --fail \
     --request GET \
+    --header "Authorization: Bearer ${GITHUB_TOKEN}" \
     --header "Accept: application/vnd.github.v3+json" \
     "https://api.github.com/repos/${REPOSITORY}/pulls?state=open&head=${REPOSITORY_OWNER}:${BRANCH}" \
     | jq -r length
