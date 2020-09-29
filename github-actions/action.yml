@@ -23,6 +23,18 @@ inputs:
     required: false
     default: |-
       third-party/**/*
+  branch:
+    description: |-
+      The branch name used by the bot to be pushed at the origin.
+    default: generated-doc-github-actions
+  commit_title:
+    description: |-
+      The title of the commit with the generated doc. The PR will also use this
+      title.
+    default: 'doc: auto-generated GitHub Actions README.md'
+  github_token:
+    description: The GitHub repository token.
+    required: true
 outputs: {}
 runs:
   using: composite
@@ -45,8 +57,18 @@ runs:
         git config user.name github-actions
         git config user.email github-actions@github.com
 
+        git checkout -B "${BRANCH}"
         git add ${{ steps.modified_files.outputs.files }}
-        git commit --message 'doc: auto-generated GH Actions README.md'
-        git push
+        git commit --message "${COMMIT_TITLE}"
+        git push --force-with-lease --set-upstream origin "${BRANCH}"
+
+        '${{ github.action_path }}/open_pr.sh'
       fi
+    env:
+      GITHUB_TOKEN: '${{ inputs.github_token }}'
+      REPOSITORY: '${{ github.repository }}'
+      REPOSITORY_OWNER: '${{ github.repository_owner }}'
+      BRANCH: '${{ inputs.branch }}'
+      COMMIT_TITLE: '${{ inputs.commit_title }}'
+      BASE_REF: '${{ github.ref }}'
     shell: bash

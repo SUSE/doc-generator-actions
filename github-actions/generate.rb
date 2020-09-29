@@ -51,8 +51,8 @@ Dir.chdir git_root.chomp do
         inputs.each do |name, input|
           description = input["description"].gsub(/\s+/, ' ')
           required = input["required"]
-          default = input["default"]
-          f << "| #{name} | #{description} | #{required} | `#{default}` |\n"
+          default = "`#{input["default"]}`" unless input["default"].nil? || input["default"].empty?
+          f << "| #{name} | #{description} | #{required} | #{default} |\n"
         end
       else
         f << "This action has no inputs.\n"
